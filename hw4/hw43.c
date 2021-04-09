@@ -50,6 +50,10 @@ void initUltrasonic()
 {
     pinMode(TRIG_PIN, OUTPUT);
     pinMode(ECHO_PIN, INPUT);
+
+    // TRIG_PIN must start LOW
+    digitalWrite(TRIG_PIN, LOW);
+    delay(30);
 }
 
 void initMotor()
@@ -91,18 +95,22 @@ int getDistance()
     int start_time = 0, end_time = 0;
     float distance = 0;
 
-    digitalWrite(TRIG_PIN, LOW);
-    delayMicroseconds(10);
+    // Send trigger pulse
     digitalWrite(TRIG_PIN, HIGH);
     delayMicroseconds(10);
     digitalWrite(TRIG_PIN, LOW);
 
+    // Wait for echo start
     while (digitalRead(ECHO_PIN) == 0)
-        start_time = micros();
+        ;
+    start_time = micros();
 
+    // Wait for echo end
     while (digitalRead(ECHO_PIN) == 1)
-        end_time = micros();
+        ;
+    end_time = micros();
 
+    // Get distance in cm
     distance = (end_time - start_time) / 29. / 2.;
 
     return (int)distance;
