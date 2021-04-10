@@ -10,10 +10,9 @@
 #define IN4_PIN 6
 
 void initUltrasonic();
-void initMotor();
 void initDCMotor();
 void goForward();
-void goRight();
+void goBackward();
 void stopDCMotor();
 int getDistance();
 
@@ -23,11 +22,12 @@ int main(void)
         return 0;
 
     int distance = 0;
-    initUltrasonic();
-    initMotor();
 
-    // Run motor
+    // Init
+    initUltrasonic();
     initDCMotor();
+
+    // Go forward
     goForward();
 
     while (1)
@@ -35,23 +35,28 @@ int main(void)
         distance = getDistance();
         printf("distance %dcm\n", distance);
 
-        if (distance < 30)
+        if (distance > 50)
+        {
+            stopDCMotor();
+            delay(100);
+            goForward();
+        }
+        else if (distance > 20)
+        {
+            stopDCMotor();
+            delay(100);
+            goBackward();
+        }
+        else
+        {
             break;
+        }
 
-        delay(100);
+        delay(500);
     }
 
     // Stop the Car
     stopDCMotor();
-    delay(500);
-
-    // Turn 180 and go forward for 2 sec
-    goRight();
-    delay(1250);
-    goForward();
-    delay(2000);
-    stopDCMotor();
-
     return 0;
 }
 
@@ -95,16 +100,13 @@ int getDistance()
 /**
  * DC Motor functions
  */
-void initMotor()
+void initDCMotor()
 {
     pinMode(IN1_PIN, OUTPUT);
     pinMode(IN2_PIN, OUTPUT);
     pinMode(IN3_PIN, OUTPUT);
     pinMode(IN4_PIN, OUTPUT);
-}
 
-void initDCMotor()
-{
     digitalWrite(IN1_PIN, HIGH);
     digitalWrite(IN2_PIN, HIGH);
     digitalWrite(IN3_PIN, HIGH);
@@ -120,13 +122,13 @@ void goForward()
     printf("Forward\n");
 }
 
-void goRight()
+void goBackward()
 {
-    digitalWrite(IN1_PIN, HIGH);
-    digitalWrite(IN2_PIN, LOW);
+    digitalWrite(IN1_PIN, LOW);
+    digitalWrite(IN2_PIN, HIGH);
     digitalWrite(IN3_PIN, LOW);
     digitalWrite(IN4_PIN, HIGH);
-    printf("Right\n");
+    printf("Backward\n");
 }
 
 void stopDCMotor()
