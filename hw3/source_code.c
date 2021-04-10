@@ -25,8 +25,6 @@ void smoothLeft();
 void smoothRight();
 void moveTheCar();
 
-int cntr = 1;
-
 int main(void)
 {
 	if (wiringPiSetup() == -1)
