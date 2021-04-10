@@ -13,6 +13,7 @@ void initUltrasonic();
 void initMotor();
 void initDCMotor();
 void goForward();
+void goRight();
 void stopDCMotor();
 int getDistance();
 
@@ -35,13 +36,21 @@ int main(void)
         printf("distance %dcm\n", distance);
 
         if (distance < 30)
-        {
-            stopDCMotor();
-            return 0;
-        }
+            break;
 
         delay(100);
     }
+
+    // Stop the Car
+    stopDCMotor();
+    delay(500);
+
+    // Turn 180 and go forward for 2 sec
+    goRight();
+    delay(1250);
+    goForward();
+    delay(2000);
+    stopDCMotor();
 
     return 0;
 }
@@ -109,6 +118,15 @@ void goForward()
     digitalWrite(IN3_PIN, HIGH);
     digitalWrite(IN4_PIN, LOW);
     printf("Forward\n");
+}
+
+void goRight()
+{
+    digitalWrite(IN1_PIN, HIGH);
+    digitalWrite(IN2_PIN, LOW);
+    digitalWrite(IN3_PIN, LOW);
+    digitalWrite(IN4_PIN, HIGH);
+    printf("Right\n");
 }
 
 void stopDCMotor()
