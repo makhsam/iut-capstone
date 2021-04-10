@@ -46,6 +46,9 @@ int main(void)
     return 0;
 }
 
+/**
+ * Ultrasonic sensor functions
+ */
 void initUltrasonic()
 {
     pinMode(TRIG_PIN, OUTPUT);
@@ -54,6 +57,30 @@ void initUltrasonic()
     // TRIG_PIN must start LOW
     digitalWrite(TRIG_PIN, LOW);
     delay(500);
+}
+
+int getDistance()
+{
+    int start_time = 0, end_time = 0;
+    float distance = 0;
+
+    // Send trigger pulse
+    digitalWrite(TRIG_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG_PIN, LOW);
+
+    // Wait for echo start
+    while (digitalRead(ECHO_PIN) == 0)
+        start_time = micros(); // Saves the last known time of LOW pulse
+
+    // Wait for echo end
+    while (digitalRead(ECHO_PIN) == 1)
+        end_time = micros(); // Saves the last known time of HIGH pulse
+
+    // Get distance in cm
+    distance = (end_time - start_time) / 29. / 2.;
+
+    return (int)distance;
 }
 
 /**
@@ -91,32 +118,4 @@ void stopDCMotor()
     digitalWrite(IN3_PIN, LOW);
     digitalWrite(IN4_PIN, LOW);
     printf("Stop\n");
-}
-
-int getDistance()
-{
-    int start_time = 0, end_time = 0;
-    float distance = 0;
-
-    // Send trigger pulse
-    // digitalWrite(TRIG_PIN, LOW);
-    // printf("Waiting for Sensor To Settle\n");
-    // delay(500);
-
-    digitalWrite(TRIG_PIN, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(TRIG_PIN, LOW);
-
-    // Wait for echo start
-    while (digitalRead(ECHO_PIN) == 0)
-        start_time = micros(); // Saves the last known time of LOW pulse
-
-    // Wait for echo end
-    while (digitalRead(ECHO_PIN) == 1)
-        end_time = micros(); // Saves the last known time of HIGH pulse
-
-    // Get distance in cm
-    distance = (end_time - start_time) / 29. / 2.;
-
-    return (int)distance;
 }
