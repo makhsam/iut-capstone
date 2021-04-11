@@ -1,5 +1,9 @@
+/**
+ * Improved version of vehicle tracking & keep distance
+ */
 #include <stdio.h>
 #include <wiringPi.h>
+#include <softPwm.h>
 
 #define TRIG_PIN 28
 #define ECHO_PIN 29
@@ -9,12 +13,20 @@
 #define IN3_PIN 5
 #define IN4_PIN 6
 
+#define MAX_SPEED 100
+#define LOW_SPEED 30
+#define MIN_SPEED 0
+#define NORMAL_SPEED 65
+#define NORMAL_DISTANCE 50
+
 void initUltrasonic();
 void initDCMotor();
-void goForward();
-void goBackward();
+void goForward(int);
 void stopDCMotor();
 int getDistance();
+void runTheCar(int);
+int min(int, int);
+int max(int, int);
 
 int main(void)
 {
@@ -27,37 +39,44 @@ int main(void)
     initUltrasonic();
     initDCMotor();
 
+    // stopDCMotor();
+    // return 0;
+
     // Go forward
-    goForward();
+    goForward(50);
 
     while (1)
     {
         distance = getDistance();
         printf("distance %dcm\n", distance);
 
-        if (distance > 50)
-        {
-            stopDCMotor();
-            delay(100);
-            goForward();
-        }
-        else if (distance > 20)
-        {
-            stopDCMotor();
-            delay(100);
-            goBackward();
-        }
-        else
-        {
-            break;
-        }
+        runTheCar(distance);
 
-        delay(500);
+        delay(100);
     }
 
     // Stop the Car
     stopDCMotor();
     return 0;
+}
+
+void runTheCar(int distance)
+{
+    // Stop the car
+    if (distance < 20)
+        stopDCMotor();
+
+    // Slow down
+    else if (distance >= 20 && distance < 45)
+        goForward(distance * 1.5); // map distance [20, 45] to speed [30, 65]
+
+    // Normal speed
+    else if (distance >= 45 && distance < 55)
+        goForward(NORMAL_SPEED);
+
+    // Go faster
+    else
+        goForward(distance * 1.2); // map distance >= 55 to speed [65, 100]
 }
 
 /**
@@ -102,40 +121,44 @@ int getDistance()
  */
 void initDCMotor()
 {
-    pinMode(IN1_PIN, OUTPUT);
-    pinMode(IN2_PIN, OUTPUT);
-    pinMode(IN3_PIN, OUTPUT);
-    pinMode(IN4_PIN, OUTPUT);
+    pinMode(IN1_PIN, SOFT_PWM_OUTPUT);
+    pinMode(IN2_PIN, SOFT_PWM_OUTPUT);
+    pinMode(IN3_PIN, SOFT_PWM_OUTPUT);
+    pinMode(IN4_PIN, SOFT_PWM_OUTPUT);
 
-    digitalWrite(IN1_PIN, HIGH);
-    digitalWrite(IN2_PIN, HIGH);
-    digitalWrite(IN3_PIN, HIGH);
-    digitalWrite(IN4_PIN, HIGH);
+    softPwmCreate(IN1_PIN, MIN_SPEED, MAX_SPEED);
+    softPwmCreate(IN2_PIN, MIN_SPEED, MAX_SPEED);
+    softPwmCreate(IN3_PIN, MIN_SPEED, MAX_SPEED);
+    softPwmCreate(IN4_PIN, MIN_SPEED, MAX_SPEED);
 }
 
-void goForward()
+void goForward(int speed)
 {
-    digitalWrite(IN1_PIN, HIGH);
-    digitalWrite(IN2_PIN, LOW);
-    digitalWrite(IN3_PIN, HIGH);
-    digitalWrite(IN4_PIN, LOW);
-    printf("Forward\n");
-}
+    // Limit the speed between LOW_SPEED/MAX_SPEED
+    speed = min(max(speed, LOW_SPEED), MAX_SPEED);
 
-void goBackward()
-{
-    digitalWrite(IN1_PIN, LOW);
-    digitalWrite(IN2_PIN, HIGH);
-    digitalWrite(IN3_PIN, LOW);
-    digitalWrite(IN4_PIN, HIGH);
-    printf("Backward\n");
+    softPwmWrite(IN1_PIN, speed);
+    softPwmWrite(IN2_PIN, MIN_SPEED);
+    softPwmWrite(IN3_PIN, speed);
+    softPwmWrite(IN4_PIN, MIN_SPEED);
+    printf("Forward with speed %d\n", speed);
 }
 
 void stopDCMotor()
 {
-    digitalWrite(IN1_PIN, LOW);
-    digitalWrite(IN2_PIN, LOW);
-    digitalWrite(IN3_PIN, LOW);
-    digitalWrite(IN4_PIN, LOW);
+    softPwmWrite(IN1_PIN, LOW);
+    softPwmWrite(IN2_PIN, LOW);
+    softPwmWrite(IN3_PIN, LOW);
+    softPwmWrite(IN4_PIN, LOW);
     printf("Stop\n");
+}
+
+int min(int x, int y)
+{
+    return (x < y) ? x : y;
+}
+
+int max(int x, int y)
+{
+    return (x > y) ? x : y;
 }
