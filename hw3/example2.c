@@ -17,11 +17,11 @@
 void initDCMotor()
 {
     pinMode(IN1_PIN, SOFT_PWM_OUTPUT);
-    pinMode(IN4_PIN, SOFT_PWM_OUTPUT);
+    pinMode(IN2_PIN, SOFT_PWM_OUTPUT);
     pinMode(IN3_PIN, SOFT_PWM_OUTPUT);
     pinMode(IN4_PIN, SOFT_PWM_OUTPUT);
     softPwmCreate(IN1_PIN, MIN_SPEED, MAX_SPEED);
-    softPwmCreate(IN4_PIN, MIN_SPEED, MAX_SPEED);
+    softPwmCreate(IN2_PIN, MIN_SPEED, MAX_SPEED);
     softPwmCreate(IN3_PIN, MIN_SPEED, MAX_SPEED);
     softPwmCreate(IN4_PIN, MIN_SPEED, MAX_SPEED);
 }
@@ -29,7 +29,7 @@ void initDCMotor()
 void smoothLeft()
 {
     softPwmWrite(IN1_PIN, MAX_SPEED / 8);
-    softPwmWrite(IN4_PIN, MIN_SPEED);
+    softPwmWrite(IN2_PIN, MIN_SPEED);
     softPwmWrite(IN3_PIN, MAX_SPEED);
     softPwmWrite(IN4_PIN, MIN_SPEED);
 }
@@ -37,7 +37,7 @@ void smoothLeft()
 void smoothRight()
 {
     softPwmWrite(IN1_PIN, MAX_SPEED);
-    softPwmWrite(IN4_PIN, MIN_SPEED);
+    softPwmWrite(IN2_PIN, MIN_SPEED);
     softPwmWrite(IN3_PIN, MAX_SPEED / 8);
     softPwmWrite(IN4_PIN, MIN_SPEED);
 }

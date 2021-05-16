@@ -150,7 +150,7 @@ void stopDCMotor()
 void smoothLeft()
 {
 	softPwmWrite(IN1_PIN, MAX_SPEED / 8);
-	softPwmWrite(IN4_PIN, MIN_SPEED);
+	softPwmWrite(IN2_PIN, MIN_SPEED);
 	softPwmWrite(IN3_PIN, MAX_SPEED);
 	softPwmWrite(IN4_PIN, MIN_SPEED);
 	printf("Smooth Left\n");
@@ -159,7 +159,7 @@ void smoothLeft()
 void smoothRight()
 {
 	softPwmWrite(IN1_PIN, MAX_SPEED);
-	softPwmWrite(IN4_PIN, MIN_SPEED);
+	softPwmWrite(IN2_PIN, MIN_SPEED);
 	softPwmWrite(IN3_PIN, MAX_SPEED / 8);
 	softPwmWrite(IN4_PIN, MIN_SPEED);
 	printf("Smooth Right\n");
